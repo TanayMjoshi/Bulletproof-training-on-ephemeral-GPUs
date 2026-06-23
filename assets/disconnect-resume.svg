@@ -1,0 +1,79 @@
+<svg width="1200" height="660" viewBox="0 0 1200 660" xmlns="http://www.w3.org/2000/svg" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif">
+  <rect width="1200" height="660" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="60" y="62" font-size="32" font-weight="700" fill="#0f172a">A disconnect costs seconds, not hours</text>
+  <text x="60" y="96" font-size="18" fill="#64748b">Checkpoint full state every epoch to durable storage &#8594; resume instead of restart</text>
+
+  <!-- ================= TOP TRACK: without the pattern ================= -->
+  <text x="60" y="168" font-size="20" font-weight="700" fill="#b91c1c">Without the pattern</text>
+  <text x="60" y="194" font-size="15" fill="#94a3b8">weights only &#183; local scratch disk</text>
+
+  <!-- progress bar before disconnect -->
+  <rect x="60" y="214" width="430" height="56" rx="10" fill="#fee2e2" stroke="#fecaca" stroke-width="2"/>
+  <rect x="60" y="214" width="430" height="56" rx="10" fill="none"/>
+  <text x="275" y="248" font-size="16" font-weight="600" fill="#7f1d1d" text-anchor="middle">Training: epoch 1 &#8594; 90</text>
+
+  <!-- lightning disconnect -->
+  <g transform="translate(540,212)">
+    <circle cx="30" cy="30" r="30" fill="#fef2f2" stroke="#ef4444" stroke-width="2.5"/>
+    <path d="M34 10 L20 34 L30 34 L26 52 L42 26 L31 26 Z" fill="#ef4444"/>
+  </g>
+  <text x="570" y="296" font-size="14" font-weight="600" fill="#b91c1c" text-anchor="middle">disconnect</text>
+
+  <!-- arrow -->
+  <line x1="612" y1="242" x2="690" y2="242" stroke="#cbd5e1" stroke-width="3" marker-end="url(#arrowGray)"/>
+
+  <!-- restart from zero -->
+  <rect x="700" y="214" width="440" height="56" rx="10" fill="#ffffff" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="7 6"/>
+  <text x="920" y="240" font-size="16" font-weight="700" fill="#b91c1c" text-anchor="middle">Restart from epoch 0</text>
+  <text x="920" y="260" font-size="13" fill="#ef4444" text-anchor="middle">90 epochs of work lost</text>
+
+  <!-- divider -->
+  <line x1="60" y1="338" x2="1140" y2="338" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- ================= BOTTOM TRACK: with the pattern ================= -->
+  <text x="60" y="392" font-size="20" font-weight="700" fill="#15803d">With the pattern</text>
+  <text x="60" y="418" font-size="15" fill="#94a3b8">full state &#183; atomic write &#183; durable storage</text>
+
+  <!-- training with checkpoints -->
+  <rect x="60" y="438" width="430" height="56" rx="10" fill="#dcfce7" stroke="#bbf7d0" stroke-width="2"/>
+  <text x="275" y="465" font-size="16" font-weight="600" fill="#14532d" text-anchor="middle">Training: epoch 1 &#8594; 90</text>
+  <text x="275" y="484" font-size="12.5" fill="#16a34a" text-anchor="middle">checkpoint every epoch &#8595;</text>
+
+  <!-- durable storage cylinder -->
+  <g transform="translate(212,540)">
+    <ellipse cx="63" cy="12" rx="63" ry="13" fill="#bbf7d0" stroke="#16a34a" stroke-width="2"/>
+    <path d="M0 12 L0 50 A63 13 0 0 0 126 50 L126 12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <ellipse cx="63" cy="12" rx="63" ry="13" fill="#bbf7d0" stroke="#16a34a" stroke-width="2"/>
+    <text x="63" y="40" font-size="13" font-weight="600" fill="#14532d" text-anchor="middle">durable storage</text>
+    <text x="63" y="58" font-size="11" fill="#16a34a" text-anchor="middle">cloud or local</text>
+  </g>
+
+  <!-- lightning disconnect -->
+  <g transform="translate(540,436)">
+    <circle cx="30" cy="30" r="30" fill="#fef2f2" stroke="#ef4444" stroke-width="2.5"/>
+    <path d="M34 10 L20 34 L30 34 L26 52 L42 26 L31 26 Z" fill="#ef4444"/>
+  </g>
+  <text x="570" y="520" font-size="14" font-weight="600" fill="#b91c1c" text-anchor="middle">disconnect</text>
+
+  <!-- arrow -->
+  <line x1="612" y1="466" x2="690" y2="466" stroke="#86efac" stroke-width="3" marker-end="url(#arrowGreen)"/>
+
+  <!-- resume -->
+  <rect x="700" y="438" width="440" height="56" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
+  <text x="920" y="464" font-size="16" font-weight="700" fill="#14532d" text-anchor="middle">Resume from epoch 91</text>
+  <text x="920" y="484" font-size="13" fill="#16a34a" text-anchor="middle">LR &amp; optimizer pick up smoothly</text>
+
+  <!-- footer tag -->
+  <text x="600" y="636" font-size="14" fill="#94a3b8" text-anchor="middle">resumable + idempotent training on ephemeral GPUs &#183; by Tanay Joshi</text>
+
+  <defs>
+    <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0 L8 3 L0 6 Z" fill="#cbd5e1"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0 0 L8 3 L0 6 Z" fill="#86efac"/>
+    </marker>
+  </defs>
+</svg>

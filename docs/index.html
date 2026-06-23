@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Never lose a training run again — an interactive walkthrough</title>
+<style>
+  :root{
+    --bg:#fbfcfe; --panel:#ffffff; --ink:#0f172a; --muted:#64748b; --faint:#94a3b8;
+    --line:#e6eaf1; --indigo:#4f46e5; --indigo-soft:#eef2ff; --emerald:#16a34a;
+    --emerald-soft:#dcfce7; --red:#dc2626; --red-soft:#fef2f2; --amber:#d97706;
+    --radius:16px; --shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .progress-top{position:fixed;top:0;left:0;height:3px;background:var(--indigo);width:0;z-index:50;transition:width .1s linear}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  header.hero{padding:84px 0 40px;text-align:center}
+  .kicker{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--indigo);background:var(--indigo-soft);padding:6px 14px;border-radius:999px;margin-bottom:22px}
+  h1{font-size:44px;line-height:1.12;font-weight:800;margin:0 0 18px;letter-spacing:-.02em}
+  .sub{font-size:19px;color:var(--muted);max-width:620px;margin:0 auto}
+  .byline{margin-top:26px;font-size:14px;color:var(--faint)}
+  .scroll-cue{margin-top:40px;color:var(--faint);font-size:13px;animation:bob 2s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+  section{padding:54px 0;border-top:1px solid var(--line)}
+  .step-no{font-size:13px;font-weight:700;color:var(--indigo);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+  h2{font-size:30px;font-weight:800;margin:0 0 14px;letter-spacing:-.01em}
+  p.lead{font-size:17px;color:#334155;margin:0 0 22px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin:22px 0}
+  .card h3{margin:0 0 4px;font-size:15px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .hint{font-size:13px;color:var(--faint);margin-top:4px}
+
+  button{font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 16px;transition:.15s;}
+  button:hover{border-color:var(--indigo);color:var(--indigo)}
+  button.primary{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+  button.primary:hover{background:#4338ca;color:#fff}
+  button.danger{background:var(--red);color:#fff;border-color:var(--red)}
+  button.danger:hover{background:#b91c1c;color:#fff}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+  /* generic progress bar */
+  .bar{height:26px;background:#f1f5f9;border-radius:8px;overflow:hidden;position:relative;border:1px solid var(--line)}
+  .bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,#6366f1,#4f46e5);transition:width .12s linear}
+  .bar.lost>span{background:linear-gradient(90deg,#f87171,#dc2626)}
+  .barlabel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#0f172a;mix-blend-mode:luminosity}
+
+  .stat{display:flex;gap:24px;margin-top:16px;flex-wrap:wrap}
+  .stat div{font-size:13px;color:var(--muted)}
+  .stat b{display:block;font-size:24px;color:var(--ink);font-weight:800}
+  .stat b.red{color:var(--red)} .stat b.green{color:var(--emerald)}
+
+  /* toggles */
+  .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 14px;border:1px solid var(--line);border-radius:11px;margin-bottom:8px;background:#fff;cursor:pointer;user-select:none;transition:.15s}
+  .toggle.on{border-color:var(--emerald);background:var(--emerald-soft)}
+  .toggle .nm{font-weight:600;font-size:14px}
+  .toggle .nm small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+  .sw{width:40px;height:22px;border-radius:999px;background:#cbd5e1;position:relative;flex:none;transition:.15s}
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s}
+  .toggle.on .sw{background:var(--emerald)} .toggle.on .sw::after{left:20px}
+
+  .verdict{margin-top:14px;padding:14px 16px;border-radius:12px;font-size:14px;font-weight:600;line-height:1.5}
+  .verdict.ok{background:var(--emerald-soft);color:#14532d}
+  .verdict.bad{background:var(--red-soft);color:#7f1d1d}
+  .verdict ul{margin:8px 0 0;padding-left:18px;font-weight:500}
+
+  /* file box for atomic */
+  .filebox{border:2px solid var(--line);border-radius:12px;padding:18px;text-align:center;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;transition:.2s}
+  .filebox.good{border-color:var(--emerald);background:var(--emerald-soft)}
+  .filebox.bad{border-color:var(--red);background:var(--red-soft)}
+  .filebox .fname{font-weight:700;font-size:14px}
+  .filebox .fstate{font-size:13px;margin-top:6px;color:var(--muted)}
+
+  /* sweep grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+  .cell{aspect-ratio:1.6;border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--faint);background:#fff;transition:.2s}
+  .cell.run{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-soft)}
+  .cell.done{border-color:var(--emerald);color:#14532d;background:var(--emerald-soft)}
+  .cell.skip{border-color:var(--emerald);color:var(--emerald);background:#fff}
+  .cell .pct{font-size:15px;font-weight:800}
+
+  /* storage columns */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .store{border:1px solid var(--line);border-radius:12px;padding:14px;min-height:140px}
+  .store h4{margin:0 0 4px;font-size:14px}
+  .store .tag{font-size:11px;color:var(--faint);margin-bottom:10px}
+  .store.local{background:#fff} .store.durable{background:#f8fafc}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:11px;font-weight:700;padding:5px 8px;border-radius:7px;background:var(--indigo-soft);color:var(--indigo);transition:.3s}
+  .chip.gone{opacity:0;transform:scale(.6)}
+  .store.durable .chip{background:var(--emerald-soft);color:#14532d}
+  .wiped{font-size:12px;color:var(--red);font-weight:700;margin-top:8px;min-height:16px}
+
+  canvas{width:100%;height:auto;display:block}
+
+  pre{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 18px;overflow:auto;font-size:13px;line-height:1.55;margin:16px 0}
+  pre .c{color:#64748b} pre .k{color:#c4b5fd} pre .s{color:#86efac} pre .f{color:#7dd3fc}
+  code.inline{background:#eef2ff;color:#4338ca;padding:2px 6px;border-radius:6px;font-size:.92em;font-family:ui-monospace,Menlo,monospace}
+
+  /* final checklist */
+  .check label{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer;font-size:15px}
+  .check input{margin-top:4px;width:18px;height:18px;accent-color:var(--emerald);flex:none}
+  .check label.done span{color:var(--faint);text-decoration:line-through}
+  .cta{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border-radius:var(--radius);padding:30px;text-align:center;margin-top:30px}
+  .cta h3{color:#fff;text-transform:none;font-size:22px;margin:0 0 8px}
+  .cta p{color:#e0e7ff;margin:0 0 6px}
+  .site-footer{border-top:1px solid var(--line);background:#fff;margin-top:56px;padding:54px 22px 30px}
+  .foot-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:40px}
+  .foot-brand{max-width:320px}
+  .foot-logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
+  .foot-logo .mark{width:26px;height:26px;border-radius:7px;background:var(--indigo);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+  .foot-tag{font-size:13.5px;color:var(--muted);line-height:1.6;margin:14px 0 18px}
+  .foot-social{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+  .foot-social a{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;transition:.15s}
+  .foot-social a:hover{color:var(--indigo);border-color:var(--indigo)}
+  .foot-social svg{width:17px;height:17px;fill:currentColor}
+  .foot-by{font-size:13px;color:var(--faint)}
+  .foot-col h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);margin:0 0 15px}
+  .foot-col a{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--muted);text-decoration:none;margin-bottom:12px;transition:.15s;width:fit-content}
+  .foot-col a:hover{color:var(--indigo)}
+  .foot-col a .soon{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);background:#f1f5f9;padding:2px 6px;border-radius:5px}
+  .foot-bottom{max-width:1080px;margin:38px auto 0;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;font-size:12.5px;color:var(--faint);flex-wrap:wrap}
+  @media(max-width:820px){.foot-grid{grid-template-columns:1fr 1fr}.foot-brand{grid-column:1/-1;max-width:none}}
+  @media(max-width:480px){.foot-grid{grid-template-columns:1fr}}
+
+  /* ===== three-zone layout: TOC rail · content · takeaway rail ===== */
+  .shell{display:grid;grid-template-columns:236px minmax(0,720px) 220px;justify-content:center;gap:34px;max-width:1250px;margin:0 auto;padding:0 22px;align-items:start}
+  .content{min-width:0}
+  .content section:first-child{border-top:none}
+
+  .toc{position:sticky;top:70px;align-self:start;font-size:13.5px}
+  .toc .tt{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 16px 14px}
+  .toc ol{list-style:none;margin:0;padding:0;position:relative}
+  .toc ol::before{content:"";position:absolute;left:5px;top:10px;bottom:14px;width:2px;background:var(--line)}
+  .toc li{position:relative;padding:8px 0 8px 24px;color:var(--muted);cursor:pointer;line-height:1.35;transition:color .15s}
+  .toc li::before{content:"";position:absolute;left:0;top:12px;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--line);transition:.2s;box-sizing:border-box}
+  .toc li:hover{color:var(--ink)}
+  .toc li.active{color:var(--indigo);font-weight:700}
+  .toc li.active::before{border-color:var(--indigo);background:var(--indigo);box-shadow:0 0 0 4px var(--indigo-soft)}
+  .toc li.done{color:#475569}
+  .toc li.done::before{border-color:var(--emerald);background:var(--emerald)}
+  .toc .num{display:inline-block;min-width:13px;font-size:11px;color:var(--faint);font-weight:700}
+  .toc li.active .num{color:var(--indigo)}
+
+  .aside{position:sticky;top:70px;align-self:start}
+  .aside .kbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 16px 18px}
+  .aside .klabel{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--indigo);margin-bottom:9px}
+  .aside .ktext{font-size:14px;color:#334155;line-height:1.55;font-weight:500;min-height:66px}
+  .aside .kmeta{margin-top:6px;font-size:12px;color:var(--faint)}
+  .aside .kbar{height:5px;border-radius:999px;background:#eef1f6;margin-top:7px;overflow:hidden}
+  .aside .kbar>span{display:block;height:100%;width:0;background:var(--indigo);transition:width .35s ease}
+
+  @media(max-width:1180px){.shell{grid-template-columns:212px minmax(0,720px);gap:30px}.aside{display:none}}
+  @media(max-width:920px){.shell{grid-template-columns:minmax(0,760px);padding:0}.toc{display:none}}
+  @media(max-width:560px){h1{font-size:34px}h2{font-size:25px}.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="progress-top" id="topbar"></div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">Interactive walkthrough</span>
+    <h1>Never lose a training run again</h1>
+    <p class="sub">Free GPUs disconnect without warning. Here's the engineering pattern that turns a dropped session from <em>hours lost</em> into a <em>shrug</em> — explained by letting you break things yourself.</p>
+    <div class="byline">By Tanay Joshi · ~6 min · play with every demo</div>
+    <div class="scroll-cue">↓ scroll to start training</div>
+  </div>
+</header>
+
+<div class="shell">
+<nav class="toc" id="tocNav"></nav>
+<main class="content">
+
+<!-- ============ PROBLEM / HERO DEMO ============ -->
+<section>
+  <div class="wrap">
+    <div class="step-no">The problem</div>
+    <h2>It's epoch 90 of 100. The session drops.</h2>
+    <p class="lead">Press <b>Start</b>, then hit <b>Simulate disconnect</b> mid-run. Toggle the pattern on and off to feel the difference.</p>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:14px">
+        <h3 style="margin:0">Training run</h3>
+        <label class="toggle on" id="heroToggle" style="margin:0;width:auto;padding:7px 12px">
+          <span class="nm" style="font-size:13px">Resumable pattern</span><span class="sw"></span>
+        </label>
+      </div>
+      <div class="bar" id="heroBar"><span></span><div class="barlabel" id="heroLabel">epoch 0 / 100</div></div>
+      <div class="row" style="margin-top:14px">
+        <button class="primary" id="heroStart">Start training</button>
+        <button class="danger" id="heroKill" disabled>Simulate disconnect</button>
+        <button id="heroReset">Reset</button>
+      </div>
+      <div class="stat">
+        <div><b id="heroLost" class="red">0</b>epochs lost to disconnects</div>
+        <div><b id="heroDrops">0</b>disconnects survived</div>
+      </div>
+      <div class="verdict ok" id="heroVerdict" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 1. WHOLE STATE ============ -->
+<section>
+  <div class="wrap">
+    <div class="step-no">Idea 1</div>
+    <h2>Checkpoint the <em>whole</em> state — not just the weights</h2>
+    <p class="lead">Most people save only <code class="inline">model.state_dict()</code>. Watch what a "resume" actually does when pieces are missing. Toggle each one and read the outcome.</p>
+
+    <div class="card">
+      <h3>What's in your checkpoint?</h3>
+      <div id="stateToggles" style="margin-top:12px"></div>
+      <div class="verdict" id="stateVerdict"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. ATOMIC ============ -->
+<section>
+  <div class="wrap">
+    <div class="step-no">Idea 2</div>
+    <h2>Write atomically — or risk a corrupted checkpoint</h2>
+    <p class="lead">If the machine dies <em>while writing</em>, a naive save leaves a half-written file — and destroys the good one it was overwriting. Flip "crash mid-write" on and try both saves.</p>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:14px">
+        <h3 style="margin:0">checkpoint.pt</h3>
+        <label class="toggle" id="crashToggle" style="margin:0;width:auto;padding:7px 12px">
+          <span class="nm" style="font-size:13px">Crash mid-write</span><span class="sw"></span>
+        </label>
+      </div>
+      <div class="filebox good" id="atomBox">
+        <div class="fname">checkpoint.pt</div>
+        <div class="fstate" id="atomState">✓ valid — epoch 42</div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button id="saveNaive">Save (naive overwrite)</button>
+        <button class="primary" id="saveAtomic">Save (temp → rename)</button>
+      </div>
+      <div class="hint" id="atomHint">A rename on the same filesystem is atomic: you get the complete old file or the complete new one — never a torn mix.</div>
+    </div>
+
+    <pre><span class="k">def</span> <span class="f">save_atomic</span>(path, state):
+    tmp = path + <span class="s">".tmp"</span>
+    torch.save(state, tmp)
+    os.replace(tmp, path)   <span class="c"># atomic on the same filesystem</span></pre>
+  </div>
+</section>
+
+<!-- ============ 3. DONE MARKER ============ -->
+<section>
+  <div class="wrap">
+    <div class="step-no">Idea 3</div>
+    <h2>A "done marker" makes a whole sweep idempotent</h2>
+    <p class="lead">Run a 3×3 sweep. Disconnect partway. Then re-launch the <em>entire</em> batch — finished runs skip instantly, the interrupted one resumes, nothing is ever duplicated.</p>
+
+    <div class="card">
+      <div class="grid" id="sweepGrid"></div>
+      <div class="row" style="margin-top:16px">
+        <button class="primary" id="sweepRun">Run sweep</button>
+        <button class="danger" id="sweepKill" disabled>Disconnect</button>
+        <button id="sweepRelaunch" disabled>Re-launch batch</button>
+        <button id="sweepReset">Reset</button>
+      </div>
+      <div class="stat">
+        <div><b id="sweepDone" class="green">0</b>runs complete</div>
+        <div><b id="sweepDup">0</b>runs duplicated</div>
+        <div><b id="sweepSkip">0</b>skipped on re-launch</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. DURABLE STORAGE ============ -->
+<section>
+  <div class="wrap">
+    <div class="step-no">Idea 4</div>
+    <h2>Put the state where it outlives the machine</h2>
+    <p class="lead">The #1 mistake: checkpointing to the node's local scratch disk, which is wiped the instant the runtime recycles. Choose where you save, then recycle the machine.</p>
+
+    <div class="card">
+      <div class="row" style="margin-bottom:14px">
+        <span style="font-size:14px;font-weight:600;color:var(--muted)">Save checkpoints to:</span>
+        <button class="primary" id="destLocal">Local scratch</button>
+        <button id="destDurable">Durable storage</button>
+      </div>
+      <div class="cols">
+        <div class="store local"><h4>Local scratch disk</h4><div class="tag">on the compute node — ephemeral</div><div class="chips" id="localChips"></div><div class="wiped" id="localWiped"></div></div>
+        <div class="store durable"><h4>Durable storage</h4><div class="tag">cloud bucket / mounted drive / your SSD</div><div class="chips" id="durableChips"></div></div>
+      </div>
+      <div class="row" style="margin-top:16px">
+        <button id="addCkpt">Train 1 epoch → save</button>
+        <button class="danger" id="recycle">Recycle machine</button>
+        <button id="storeReset">Reset</button>
+      </div>
+      <div class="verdict" id="storeVerdict" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. RESUME = CONTINUE ============ -->
+<section>
+  <div class="wrap">
+    <div class="step-no">Idea 5</div>
+    <h2>Resume means <em>continue</em>, not restart</h2>
+    <p class="lead">The tell-tale smoke test is the learning rate. Restore the scheduler and the LR picks up smoothly; forget it and the LR snaps back to its starting value. Toggle it and re-run.</p>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px">
+        <h3 style="margin:0">Learning-rate schedule</h3>
+        <label class="toggle on" id="schedToggle" style="margin:0;width:auto;padding:7px 12px">
+          <span class="nm" style="font-size:13px">Restore scheduler state</span><span class="sw"></span>
+        </label>
+      </div>
+      <canvas id="lrCanvas" width="700" height="280"></canvas>
+      <div class="row" style="margin-top:12px">
+        <button class="primary" id="lrRun">Train → disconnect at epoch 50 → resume</button>
+        <button id="lrReset">Reset</button>
+      </div>
+      <div class="verdict" id="lrVerdict" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHECKLIST + CTA ============ -->
+<section>
+  <div class="wrap">
+    <div class="step-no">The payoff</div>
+    <h2>Your bulletproofing checklist</h2>
+    <p class="lead">Tick them off — these are the six moves that make any training job survive an ephemeral machine.</p>
+    <div class="card check" id="checklist"></div>
+
+    <div class="cta">
+      <h3>Found this useful?</h3>
+      <p>I write about the unglamorous engineering that makes ML actually ship.</p>
+      <p style="margin-top:14px"><b>Read the full write-up with all the code →</b></p>
+    </div>
+  </div>
+</section>
+
+</main>
+<aside class="aside" id="asideRail"></aside>
+</div>
+
+<!-- ============================================================
+     FOOTER — replace the placeholder URLs (YOUR-…) with your real
+     links once published. Email is already set.
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <div class="foot-logo"><span class="mark">↻</span> Bulletproof Training</div>
+      <p class="foot-tag">A pattern for making ML training runs resumable and idempotent on ephemeral GPUs — so a disconnect costs seconds, not hours.</p>
+      <div class="foot-social">
+        <a href="https://x.com/YOUR-HANDLE" target="_blank" rel="noopener" aria-label="X / Twitter" title="X / Twitter">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://github.com/YOUR-USERNAME" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.78 0 12.29c0 5.21 3.44 9.63 8.21 11.19.6.11.82-.25.82-.56v-2c-3.34.71-4.04-1.58-4.04-1.58-.55-1.36-1.34-1.72-1.34-1.72-1.09-.73.08-.71.08-.71 1.2.08 1.84 1.21 1.84 1.21 1.07 1.79 2.81 1.27 3.5.97.11-.76.42-1.27.76-1.56-2.67-.3-5.47-1.31-5.47-5.81 0-1.28.47-2.33 1.24-3.15-.13-.3-.54-1.51.12-3.15 0 0 1.01-.32 3.3 1.2a11.6 11.6 0 0 1 6 0c2.29-1.52 3.3-1.2 3.3-1.2.66 1.64.25 2.85.12 3.15.77.82 1.24 1.87 1.24 3.15 0 4.51-2.81 5.5-5.49 5.79.43.36.81 1.09.81 2.2v3.26c0 .31.22.68.83.56A12.02 12.02 0 0 0 24 12.29C24 5.78 18.63.5 12 .5z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/YOUR-HANDLE" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+        </a>
+        <a href="mailto:joshitanay04@gmail.com" aria-label="Email" title="Email">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4h20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm10 7.42L3.6 6H20.4L12 11.42zM3 8.13V18h18V8.13l-9 5.8-9-5.8z"/></svg>
+        </a>
+      </div>
+      <div class="foot-by">By Tanay Joshi</div>
+    </div>
+
+    <div class="foot-col">
+      <h4>Read the article</h4>
+      <a href="https://dev.to/YOUR-HANDLE/bulletproof-training" target="_blank" rel="noopener">Dev.to</a>
+      <a href="https://medium.com/@YOUR-HANDLE/bulletproof-training" target="_blank" rel="noopener">Medium</a>
+      <a href="https://www.linkedin.com/pulse/YOUR-ARTICLE-SLUG" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://peerlist.io/YOUR-HANDLE/articles/YOUR-ARTICLE" target="_blank" rel="noopener">Peerlist</a>
+    </div>
+
+    <div class="foot-col">
+      <h4>Project</h4>
+      <a href="https://github.com/YOUR-USERNAME/bulletproof-training" target="_blank" rel="noopener">GitHub repo</a>
+      <a href="./">Live walkthrough</a>
+      <a href="https://github.com/YOUR-USERNAME/bulletproof-training/blob/main/src/resumable_trainer.py" target="_blank" rel="noopener">The code</a>
+      <a href="https://github.com/YOUR-USERNAME/bulletproof-training/raw/main/assets/disconnect-resume.png" target="_blank" rel="noopener">The diagram</a>
+    </div>
+
+    <div class="foot-col">
+      <h4>Connect</h4>
+      <a href="https://www.linkedin.com/in/YOUR-HANDLE" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://x.com/YOUR-HANDLE" target="_blank" rel="noopener">X / Twitter</a>
+      <a href="https://github.com/YOUR-USERNAME" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:joshitanay04@gmail.com">Email</a>
+    </div>
+  </div>
+
+  <div class="foot-bottom">
+    <span>© 2026 Tanay Joshi</span>
+    <span>Resumable + idempotent training on ephemeral GPUs</span>
+  </div>
+</footer>
+
+<script>
+// ---------- scroll progress ----------
+const topbar=document.getElementById('topbar');
+addEventListener('scroll',()=>{const h=document.documentElement;const p=h.scrollTop/(h.scrollHeight-h.clientHeight);topbar.style.width=(p*100)+'%';});
+
+// ---------- helper ----------
+const $=id=>document.getElementById(id);
+function toggleClick(el,cb){el.addEventListener('click',()=>{el.classList.toggle('on');cb(el.classList.contains('on'));});}
+
+// ============ HERO ============
+(()=>{
+  const bar=$('heroBar'),fill=bar.querySelector('span'),label=$('heroLabel');
+  let epoch=0,timer=null,lastCkpt=0,lost=0,drops=0,resumable=true;
+  const tog=$('heroToggle');
+  toggleClick(tog,on=>{resumable=on;});
+  function render(){fill.style.width=epoch+'%';label.textContent='epoch '+epoch+' / 100';}
+  function tick(){
+    epoch++; if(resumable&&epoch%5===0)lastCkpt=epoch;
+    render();
+    if(epoch>=100){stop();label.textContent='✅ training complete';$('heroVerdict').style.display='block';$('heroVerdict').className='verdict ok';$('heroVerdict').textContent='Done with no lost work. That\'s the goal.';}
+  }
+  function start(){if(timer)return;$('heroStart').disabled=true;$('heroKill').disabled=false;timer=setInterval(tick,90);}
+  function stop(){clearInterval(timer);timer=null;$('heroKill').disabled=true;}
+  $('heroStart').onclick=start;
+  $('heroKill').onclick=()=>{
+    stop();drops++;$('heroDrops').textContent=drops;
+    const v=$('heroVerdict');v.style.display='block';
+    if(resumable){
+      lost+=0; bar.classList.remove('lost');
+      epoch=lastCkpt; render();
+      v.className='verdict ok';
+      v.innerHTML='🔌 Disconnected at the bar — but you checkpointed at epoch '+lastCkpt+'. <b>Resuming there.</b> Press Start to continue.';
+    }else{
+      lost+=epoch; $('heroLost').textContent=lost;
+      bar.classList.add('lost');
+      v.className='verdict bad';
+      v.innerHTML='💥 No checkpoints. <b>'+epoch+' epochs evaporated.</b> Back to zero. Press Start to suffer again.';
+      epoch=0; render();
+    }
+    $('heroStart').disabled=false;
+  };
+  $('heroReset').onclick=()=>{stop();epoch=0;lastCkpt=0;lost=0;drops=0;$('heroLost').textContent=0;$('heroDrops').textContent=0;bar.classList.remove('lost');$('heroVerdict').style.display='none';$('heroStart').disabled=false;render();};
+  render();
+})();
+
+// ============ 1. WHOLE STATE ============
+(()=>{
+  const parts=[
+    {k:'model',nm:'Model weights',sub:'state_dict()',locked:true},
+    {k:'opt',nm:'Optimizer state',sub:"Adam's momentum & variance"},
+    {k:'sched',nm:'LR scheduler',sub:'where the schedule is'},
+    {k:'epoch',nm:'Epoch counter',sub:'how far you got'},
+    {k:'rng',nm:'RNG state',sub:'torch / numpy / python seeds'},
+  ];
+  const state={model:true,opt:true,sched:true,epoch:true,rng:true};
+  const host=$('stateToggles');
+  parts.forEach(p=>{
+    const el=document.createElement('div');el.className='toggle on';
+    el.innerHTML='<span class="nm">'+p.nm+'<small>'+p.sub+'</small></span><span class="sw"></span>';
+    if(p.locked){el.style.opacity='.7';el.title='You always need the weights';}
+    else el.onclick=()=>{state[p.k]=!state[p.k];el.classList.toggle('on');render();};
+    host.appendChild(el);
+  });
+  function render(){
+    const problems=[];
+    if(!state.opt)problems.push('Optimizer reset → Adam loses its momentum/variance; the first steps after resume lurch.');
+    if(!state.sched)problems.push('Scheduler reset → learning rate <b>snaps back to its starting value</b>.');
+    if(!state.epoch)problems.push('No epoch counter → you <b>re-run epochs you already finished</b>.');
+    if(!state.rng)problems.push('No RNG state → the run is <b>no longer reproducible</b> across the break.');
+    const v=$('stateVerdict');
+    if(problems.length===0){v.className='verdict ok';v.innerHTML='✅ <b>Clean resume.</b> Everything continues exactly where it left off — reproducible, with the LR and optimizer intact.';}
+    else{v.className='verdict bad';v.innerHTML='⚠️ <b>This "resume" is broken:</b><ul><li>'+problems.join('</li><li>')+'</li></ul>';}
+  }
+  render();
+})();
+
+// ============ 2. ATOMIC ============
+(()=>{
+  let crash=false,epoch=42;
+  toggleClick($('crashToggle'),on=>crash=on);
+  const box=$('atomBox'),st=$('atomState'),hint=$('atomHint');
+  function valid(){box.className='filebox good';st.textContent='✓ valid — epoch '+epoch;}
+  $('saveNaive').onclick=()=>{
+    const next=epoch+5;
+    if(crash){box.className='filebox bad';st.innerHTML='✗ CORRUPTED — half-written.<br>The good epoch-'+epoch+' file is gone too.';hint.innerHTML='<b style="color:var(--red)">This is the trap.</b> A naive overwrite was interrupted mid-write: the new file is torn AND the previous good checkpoint is already destroyed.';}
+    else{epoch=next;valid();hint.textContent='No crash this time, so it looks fine — but you were one unlucky moment away from corruption.';}
+  };
+  $('saveAtomic').onclick=()=>{
+    const next=epoch+5;
+    if(crash){valid();hint.innerHTML='✓ Crash during the write to <code class="inline">.tmp</code> — but <code class="inline">os.replace()</code> never ran, so <b>checkpoint.pt is still the complete epoch-'+epoch+' file.</b> Nothing lost.';}
+    else{epoch=next;valid();hint.innerHTML='Wrote to <code class="inline">.tmp</code>, then atomically renamed into place. checkpoint.pt is now epoch '+epoch+'.';}
+  };
+})();
+
+// ============ 3. SWEEP ============
+(()=>{
+  const N=9; const grid=$('sweepGrid'); const cells=[];
+  const seeds=[1,2,3],cfgs=['lr=1e-3','lr=3e-4','lr=1e-4'];
+  for(let i=0;i<N;i++){const c=document.createElement('div');c.className='cell';c.innerHTML='<span>seed '+seeds[(i/3|0)]+'</span><span style="font-size:11px">'+cfgs[i%3]+'</span>';grid.appendChild(c);cells.push(c);}
+  let st=cells.map(()=>0); // 0 pending,1 running,2 done; progress%
+  let prog=cells.map(()=>0);
+  let timer=null,cur=0,killed=-1,done=0,dup=0,skip=0,relaunch=false;
+  function paint(i){const c=cells[i];c.classList.remove('run','done','skip');
+    if(st[i]===2){c.classList.add('done');c.innerHTML='<span class="pct">✓ done</span><span style="font-size:11px">'+cfgs[i%3]+'</span>';}
+    else if(st[i]===1){c.classList.add('run');c.innerHTML='<span class="pct">'+prog[i]+'%</span><span style="font-size:11px">training…</span>';}
+  }
+  function step(){
+    if(cur>=N){stop();$('sweepKill').disabled=true;return;}
+    if(st[cur]===2){ // already done -> skip fast (relaunch)
+      if(relaunch){skip++;$('sweepSkip').textContent=skip;cells[cur].classList.add('skip');cells[cur].innerHTML='<span class="pct" style="color:var(--emerald)">skip ⏭</span><span style="font-size:11px">done marker found</span>';}
+      cur++;return;
+    }
+    st[cur]=1; prog[cur]+=10; if(prog[cur]>=100){prog[cur]=100;st[cur]=2;done++;$('sweepDone').textContent=done;}
+    paint(cur);
+    if(st[cur]===2)cur++;
+  }
+  function start(){if(timer)return;timer=setInterval(step,70);}
+  function stop(){clearInterval(timer);timer=null;}
+  $('sweepRun').onclick=()=>{$('sweepRun').disabled=true;$('sweepKill').disabled=false;start();};
+  $('sweepKill').onclick=()=>{stop();killed=cur;$('sweepKill').disabled=true;$('sweepRelaunch').disabled=false;
+    if(cells[cur]){cells[cur].style.borderColor='var(--red)';cells[cur].querySelector('.pct')&&(cells[cur].querySelector('.pct').textContent=prog[cur]+'% ⚡');}
+  };
+  $('sweepRelaunch').onclick=()=>{relaunch=true;cur=0;$('sweepRelaunch').disabled=true;
+    // partial run resumes from its progress, not zero -> no dup
+    if(killed>=0&&st[killed]===1){cells[killed].style.borderColor='';}
+    $('sweepDup').textContent=dup; start();
+  };
+  $('sweepReset').onclick=()=>{stop();st=cells.map(()=>0);prog=cells.map(()=>0);cur=0;killed=-1;done=0;dup=0;skip=0;relaunch=false;
+    $('sweepDone').textContent=0;$('sweepDup').textContent=0;$('sweepSkip').textContent=0;
+    cells.forEach((c,i)=>{c.className='cell';c.style.borderColor='';c.innerHTML='<span>seed '+seeds[(i/3|0)]+'</span><span style="font-size:11px">'+cfgs[i%3]+'</span>';});
+    $('sweepRun').disabled=false;$('sweepKill').disabled=true;$('sweepRelaunch').disabled=true;
+  };
+})();
+
+// ============ 4. STORAGE ============
+(()=>{
+  let dest='local';
+  $('destLocal').onclick=()=>{dest='local';$('destLocal').className='primary';$('destDurable').className='';};
+  $('destDurable').onclick=()=>{dest='durable';$('destDurable').className='primary';$('destLocal').className='';};
+  let n=0;
+  function add(){
+    n++;const chip=document.createElement('span');chip.className='chip';chip.textContent='ckpt'+n;
+    (dest==='local'?$('localChips'):$('durableChips')).appendChild(chip);
+  }
+  $('addCkpt').onclick=add;
+  $('recycle').onclick=()=>{
+    const local=$('localChips').children;const hadLocal=local.length;
+    [...local].forEach(c=>c.classList.add('gone'));
+    setTimeout(()=>{$('localChips').innerHTML='';},320);
+    const dur=$('durableChips').children.length;
+    $('localWiped').textContent=hadLocal?('💥 '+hadLocal+' checkpoint(s) wiped'):'';
+    const v=$('storeVerdict');v.style.display='block';
+    if(hadLocal>0&&dur===0){v.className='verdict bad';v.innerHTML='💥 Everything was on local scratch. The machine recycled and <b>it\'s all gone.</b> This is the #1 mistake.';}
+    else if(dur>0&&hadLocal===0){v.className='verdict ok';v.innerHTML='✅ The machine vanished, but every checkpoint lived on durable storage. <b>Nothing lost.</b> Reconnect and resume.';}
+    else{v.className='verdict bad';v.innerHTML='⚠️ Mixed: the '+dur+' durable checkpoint(s) survived, but the '+hadLocal+' on local scratch are gone. Save <b>only</b> to durable storage.';}
+  };
+  $('storeReset').onclick=()=>{n=0;$('localChips').innerHTML='';$('durableChips').innerHTML='';$('localWiped').textContent='';$('storeVerdict').style.display='none';};
+})();
+
+// ============ 5. LR CURVE ============
+(()=>{
+  const cv=$('lrCanvas'),ctx=cv.getContext('2d');const W=cv.width,H=cv.height,pad=38;
+  let restore=true;toggleClick($('schedToggle'),on=>{restore=on;});
+  const E=100,base=1.0;
+  function lr(e){return base*0.5*(1+Math.cos(Math.PI*e/E));} // cosine decay
+  function px(e){return pad+(W-2*pad)*e/E;}
+  function py(v){return H-pad-(H-2*pad)*v/base;}
+  function axes(){ctx.clearRect(0,0,W,H);ctx.strokeStyle='#e6eaf1';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad,pad-8);ctx.lineTo(pad,H-pad);ctx.lineTo(W-pad,H-pad);ctx.stroke();
+    ctx.fillStyle='#94a3b8';ctx.font='12px Inter,sans-serif';
+    ctx.fillText('learning rate',pad-2,pad-14);ctx.fillText('epoch →',W-pad-46,H-pad+22);}
+  function dot(e,col){ctx.fillStyle=col;ctx.beginPath();ctx.arc(px(e),py(lr(e)),3,0,7);ctx.fill();}
+  let timer=null;
+  function run(){
+    axes();let e=0;let phase='pre';
+    if(timer)clearInterval(timer);
+    $('lrRun').disabled=true;$('lrVerdict').style.display='none';
+    ctx.strokeStyle='#4f46e5';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(px(0),py(lr(0)));
+    timer=setInterval(()=>{
+      if(phase==='pre'){
+        e++;ctx.lineTo(px(e),py(lr(e)));ctx.stroke();ctx.beginPath();ctx.moveTo(px(e),py(lr(e)));
+        if(e>=50){phase='gap';
+          // disconnect marker
+          ctx.save();ctx.strokeStyle='#dc2626';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(px(50),pad-6);ctx.lineTo(px(50),H-pad);ctx.stroke();ctx.restore();
+          ctx.fillStyle='#dc2626';ctx.font='bold 12px Inter';ctx.fillText('⚡ disconnect',px(50)-30,pad-10);
+        }
+      }else if(phase==='gap'){
+        phase='post';
+        if(restore){
+          ctx.strokeStyle='#16a34a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(px(50),py(lr(50)));
+        }else{
+          // LR jumps back to start value at epoch 50
+          ctx.strokeStyle='#dc2626';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(px(50),py(lr(0)));
+        }
+        e=50;
+      }else{
+        e++;
+        const v = restore ? lr(e) : base - (base-lr(50))*((e-50)/(E-50)); // wrong: decays from top again
+        const yv = restore? py(lr(e)) : py(base*0.5*(1+Math.cos(Math.PI*(e-50)/E)));
+        ctx.lineTo(px(e),yv);ctx.stroke();ctx.beginPath();ctx.moveTo(px(e),yv);
+        if(e>=E){clearInterval(timer);$('lrRun').disabled=false;
+          const vd=$('lrVerdict');vd.style.display='block';
+          if(restore){vd.className='verdict ok';vd.innerHTML='✅ The green curve continues the blue one seamlessly. <b>The scheduler state survived</b> — your optimizer did too. This is a real resume.';}
+          else{vd.className='verdict bad';vd.innerHTML='⚠️ See the jump at epoch 50? The LR <b>snapped back to its starting value</b> and started decaying all over again. Your "resume" silently restarted the schedule — training quality suffers.';}
+        }
+      }
+    },45);
+  }
+  $('lrRun').onclick=run;
+  $('lrReset').onclick=()=>{if(timer)clearInterval(timer);axes();$('lrRun').disabled=false;$('lrVerdict').style.display='none';};
+  axes();
+})();
+
+// ============ CHECKLIST ============
+(()=>{
+  const items=[
+    'Checkpoint model + optimizer + scheduler + epoch + RNG, every epoch',
+    'Write checkpoints atomically (temp file → rename)',
+    'Write a done marker only on full completion; skip finished runs',
+    'Store state on something that outlives the compute node',
+    'On startup, resume from the saved epoch, not from zero',
+    'Test it: interrupt, restart, confirm a clean resume',
+  ];
+  const host=$('checklist');
+  items.forEach(t=>{const l=document.createElement('label');
+    l.innerHTML='<input type="checkbox"><span>'+t+'</span>';
+    const cb=l.querySelector('input');cb.onchange=()=>l.classList.toggle('done',cb.checked);
+    host.appendChild(l);});
+})();
+
+// ============ SIDE RAILS: TOC scroll-spy + key-takeaway ============
+(()=>{
+  const sections=[...document.querySelectorAll('main.content > section')];
+  const meta=[
+    {label:'The problem',     k:'Key idea', t:'Engineer for the disconnect — don’t fight it with keep-alive hacks.'},
+    {label:'Checkpoint state', k:'Idea 1',   t:'A real resume needs optimizer + scheduler + epoch + RNG — not just the weights.'},
+    {label:'Atomic writes',    k:'Idea 2',   t:'Write to a temp file, then os.replace(). A rename is atomic; a write is not.'},
+    {label:'Done marker',      k:'Idea 3',   t:'Write the results file last — it’s the marker that makes a whole sweep idempotent.'},
+    {label:'Durable storage',  k:'Idea 4',   t:'If state lives on the node’s scratch disk, it’s already gone. Keep it external.'},
+    {label:'Resume = continue',k:'Idea 5',   t:'A continuous learning rate is the smoke test — it proves your state survived.'},
+    {label:'The payoff',       k:'Recap',    t:'Six checks turn an ephemeral machine from fragile into a shrug.'}
+  ];
+  const nav=document.getElementById('tocNav');
+  const ol=document.createElement('ol');
+  meta.forEach((m,i)=>{
+    const li=document.createElement('li');
+    const num=(i>0&&i<6)?'<span class="num">'+i+'</span> ':'<span class="num"></span> ';
+    li.innerHTML=num+m.label;
+    li.onclick=()=>sections[i]&&sections[i].scrollIntoView({behavior:'smooth',block:'start'});
+    ol.appendChild(li);
+  });
+  nav.innerHTML='<p class="tt">Contents</p>';nav.appendChild(ol);
+  const lis=[...ol.children];
+
+  const aside=document.getElementById('asideRail');
+  aside.innerHTML='<div class="kbox"><div class="klabel" id="kLabel">Key idea</div>'+
+    '<div class="ktext" id="kText"></div><div class="kmeta" id="kMeta"></div>'+
+    '<div class="kbar"><span id="kBar"></span></div></div>';
+  const kLabel=document.getElementById('kLabel'),kText=document.getElementById('kText'),
+        kMeta=document.getElementById('kMeta'),kBar=document.getElementById('kBar');
+
+  let cur=-1;
+  function setActive(i){
+    if(i===cur)return;cur=i;
+    lis.forEach((li,j)=>{li.classList.toggle('active',j===i);li.classList.toggle('done',j<i);});
+    kLabel.textContent=meta[i].k;kText.textContent=meta[i].t;
+    kMeta.textContent='Section '+(i+1)+' of '+meta.length;
+    kBar.style.width=((i+1)/meta.length*100)+'%';
+  }
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{if(e.isIntersecting){const i=sections.indexOf(e.target);if(i>=0)setActive(i);}});
+  },{rootMargin:'-45% 0px -45% 0px',threshold:0});
+  sections.forEach(s=>io.observe(s));
+  setActive(0);
+})();
+</script>
+</body>
+</html>
