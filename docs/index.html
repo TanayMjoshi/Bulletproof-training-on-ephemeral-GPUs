@@ -254,6 +254,7 @@
 </style>
 </head>
 <body>
+<script>(function(){try{var s=localStorage.getItem('bt-theme');var dark=s?(s==='dark'):(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(dark)document.body.classList.add('dark');}catch(e){}})();</script>
 <div class="progress-top" id="topbar"></div>
 <button class="theme-toggle" id="themeBtn" aria-label="Toggle night mode" title="Toggle night mode">
   <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -780,10 +781,14 @@ function toggleClick(el,cb){el.addEventListener('click',()=>{el.classList.toggle
   setActive(0);
 })();
 
-// ============ NIGHT MODE TOGGLE (light is default) ============
+// ============ THEME TOGGLE (auto-follows system unless user picks) ============
 (()=>{
   const btn=document.getElementById('themeBtn');
-  try{ if(localStorage.getItem('bt-theme')==='dark') document.body.classList.add('dark'); }catch(e){}
+  const mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+  if(mq){
+    const onSys=e=>{ try{ if(!localStorage.getItem('bt-theme')) document.body.classList.toggle('dark', e.matches); }catch(_){ } };
+    mq.addEventListener ? mq.addEventListener('change',onSys) : (mq.addListener && mq.addListener(onSys));
+  }
   btn.onclick=()=>{
     document.body.classList.toggle('dark');
     try{ localStorage.setItem('bt-theme', document.body.classList.contains('dark')?'dark':'light'); }catch(e){}
