@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Never lose a training run again — an interactive walkthrough</title>
+<meta name="theme-color" content="#10b981">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22e%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%2334d399%22%2F%3E%3Cstop%20offset%3D%22.55%22%20stop-color%3D%22%2310b981%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23059669%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2230%22%20height%3D%2230%22%20rx%3D%228%22%20fill%3D%22url%28%23e%29%22%2F%3E%3Crect%20x%3D%221%22%20y%3D%221%22%20width%3D%2230%22%20height%3D%2214%22%20rx%3D%228%22%20fill%3D%22%23ffffff%22%20fill-opacity%3D%22.22%22%2F%3E%3Cpath%20d%3D%22M16%205.2%20L24.4%208%20V15.2%20C24.4%2020.6%2020.8%2024.4%2016%2026.6%20C11.2%2024.4%207.6%2020.6%207.6%2015.2%20V8%20Z%22%20fill%3D%22%23ffffff%22%2F%3E%3Crect%20x%3D%2212.3%22%20y%3D%2211.2%22%20width%3D%227.4%22%20height%3D%227.4%22%20rx%3D%221.6%22%20fill%3D%22%230c8f63%22%2F%3E%3Crect%20x%3D%2214%22%20y%3D%2212.9%22%20width%3D%224%22%20height%3D%224%22%20rx%3D%22.8%22%20fill%3D%22%23ffffff%22%2F%3E%3Cg%20fill%3D%22%230c8f63%22%3E%3Crect%20x%3D%2213.3%22%20y%3D%229.6%22%20width%3D%221.1%22%20height%3D%221.8%22%20rx%3D%22.5%22%2F%3E%3Crect%20x%3D%2215.45%22%20y%3D%229.6%22%20width%3D%221.1%22%20height%3D%221.8%22%20rx%3D%22.5%22%2F%3E%3Crect%20x%3D%2217.6%22%20y%3D%229.6%22%20width%3D%221.1%22%20height%3D%221.8%22%20rx%3D%22.5%22%2F%3E%3Crect%20x%3D%2213.3%22%20y%3D%2218.6%22%20width%3D%221.1%22%20height%3D%221.8%22%20rx%3D%22.5%22%2F%3E%3Crect%20x%3D%2215.45%22%20y%3D%2218.6%22%20width%3D%221.1%22%20height%3D%221.8%22%20rx%3D%22.5%22%2F%3E%3Crect%20x%3D%2217.6%22%20y%3D%2218.6%22%20width%3D%221.1%22%20height%3D%221.8%22%20rx%3D%22.5%22%2F%3E%3Crect%20x%3D%229.8%22%20y%3D%2213.3%22%20width%3D%221.8%22%20height%3D%221.1%22%20rx%3D%22.5%22%2F%3E%3Crect%20x%3D%229.8%22%20y%3D%2215.45%22%20width%3D%221.8%22%20height%3D%221.1%22%20rx%3D%22.5%22%2F%3E%3Crect%20x%3D%2220.4%22%20y%3D%2213.3%22%20width%3D%221.8%22%20height%3D%221.1%22%20rx%3D%22.5%22%2F%3E%3Crect%20x%3D%2220.4%22%20y%3D%2215.45%22%20width%3D%221.8%22%20height%3D%221.1%22%20rx%3D%22.5%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<link rel="icon" type="image/svg+xml" sizes="any" href="favicon.svg">
+<meta name="description" content="An interactive walkthrough of a pattern that makes ML training resumable and idempotent on ephemeral GPUs (Colab, Kaggle, spot), so a disconnect costs seconds, not hours.">
+<!-- Open Graph / link preview -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://resumable-ml-training.vercel.app/">
+<meta property="og:title" content="Never lose a training run again">
+<meta property="og:description" content="An interactive walkthrough: make ML training resumable and idempotent on ephemeral GPUs. Break a training run yourself and watch it resume.">
+<meta property="og:image" content="https://resumable-ml-training.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Never lose a training run again">
+<meta name="twitter:description" content="Make ML training resumable and idempotent on ephemeral GPUs. Break a run and watch it resume.">
+<meta name="twitter:image" content="https://resumable-ml-training.vercel.app/og.png">
 <style>
   :root{
     --bg:#fbfcfe; --panel:#ffffff; --ink:#0f172a; --muted:#64748b; --faint:#94a3b8;
@@ -18,7 +34,22 @@
     font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
     line-height:1.6; -webkit-font-smoothing:antialiased;
   }
-  .progress-top{position:fixed;top:0;left:0;height:3px;background:var(--indigo);width:0;z-index:50;transition:width .1s linear}
+  /* subtle emerald "compute" ambience + barely-there grid (both themes) */
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      linear-gradient(rgba(16,185,129,.022) 1px, transparent 1px) 0 0/46px 46px,
+      linear-gradient(90deg, rgba(16,185,129,.022) 1px, transparent 1px) 0 0/46px 46px,
+      radial-gradient(58% 48% at 86% -2%, rgba(16,185,129,.10), transparent 68%),
+      radial-gradient(52% 42% at -4% 102%, rgba(16,185,129,.085), transparent 70%);
+    -webkit-mask-image:radial-gradient(150% 130% at 50% 0%, #000 55%, transparent 100%);
+            mask-image:radial-gradient(150% 130% at 50% 0%, #000 55%, transparent 100%);
+  }
+  /* liquid-glass scroll progress bar */
+  .progress-top{position:fixed;top:0;left:0;height:5px;width:0;z-index:50;
+    background:linear-gradient(90deg, rgba(52,211,153,.80), rgba(99,102,241,.85));
+    -webkit-backdrop-filter:blur(8px) saturate(160%);backdrop-filter:blur(8px) saturate(160%);
+    box-shadow:0 1px 8px rgba(79,70,229,.28), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.12);
+    border-radius:0 6px 6px 0;transition:width .12s ease-out}
   .wrap{max-width:760px;margin:0 auto;padding:0 22px}
   header.hero{padding:84px 0 40px;text-align:center}
   .kicker{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--indigo);background:var(--indigo-soft);padding:6px 14px;border-radius:999px;margin-bottom:22px}
@@ -114,7 +145,8 @@
   .foot-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:40px}
   .foot-brand{max-width:320px}
   .foot-logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;letter-spacing:-.01em;color:var(--ink)}
-  .foot-logo .mark{width:26px;height:26px;border-radius:7px;background:var(--indigo);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+  .foot-logo .mark{width:30px;height:30px;display:inline-flex;flex:none}
+  .foot-logo .mark svg{width:100%;height:100%}
   .foot-tag{font-size:13.5px;color:var(--muted);line-height:1.6;margin:14px 0 18px}
   .foot-social{display:flex;align-items:center;gap:8px;margin-bottom:16px}
   .foot-social a{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;transition:.15s}
@@ -134,22 +166,28 @@
   .content{min-width:0}
   .content section:first-child{border-top:none}
 
-  .toc{position:sticky;top:70px;align-self:start;font-size:13.5px}
+  .toc{position:sticky;top:70px;align-self:start;font-size:13.5px;
+    background:rgba(255,255,255,.5);-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);
+    border:1px solid rgba(255,255,255,.65);border-radius:18px;padding:18px 16px 16px;box-shadow:0 10px 30px rgba(15,23,42,.05)}
   .toc .tt{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin:0 0 16px 14px}
-  .toc ol{list-style:none;margin:0;padding:0;position:relative}
-  .toc ol::before{content:"";position:absolute;left:5px;top:10px;bottom:14px;width:2px;background:var(--line)}
-  .toc li{position:relative;padding:8px 0 8px 24px;color:var(--muted);cursor:pointer;line-height:1.35;transition:color .15s}
-  .toc li::before{content:"";position:absolute;left:0;top:12px;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--line);transition:.2s;box-sizing:border-box}
+  .toc ol{--p:0;list-style:none;margin:0;padding:0;position:relative}
+  /* glass rail (track) */
+  .toc ol::before{content:"";position:absolute;left:6px;top:6px;bottom:8px;width:4px;border-radius:4px;
+    background:rgba(15,23,42,.07);box-shadow:inset 0 1px 1px rgba(15,23,42,.06)}
+  /* emerald liquid-glass fill, grows with scroll */
+  .toc ol::after{content:"";position:absolute;left:6px;top:6px;width:4px;border-radius:4px;
+    height:calc(var(--p) * (100% - 14px));
+    background:linear-gradient(180deg, #50c878 0%, #16a34a 52%, #00674f 100%);
+    box-shadow:0 0 13px rgba(22,163,74,.55), 0 0 3px rgba(0,103,79,.9), inset 0 1px 0 rgba(255,255,255,.5);
+    transition:height .1s linear}
+  .toc li{position:relative;padding:8px 0 8px 26px;color:var(--muted);cursor:pointer;line-height:1.35;transition:color .15s}
   .toc li:hover{color:var(--ink)}
-  .toc li.active{color:var(--indigo);font-weight:700}
-  .toc li.active::before{border-color:var(--indigo);background:var(--indigo);box-shadow:0 0 0 4px var(--indigo-soft)}
-  .toc li.done{color:#475569}
-  .toc li.done::before{border-color:var(--emerald);background:var(--emerald)}
+  .toc li.active{color:#00674f;font-weight:700}
   .toc .num{display:inline-block;min-width:13px;font-size:11px;color:var(--faint);font-weight:700}
-  .toc li.active .num{color:var(--indigo)}
+  .toc li.active .num{color:#00674f}
 
   .aside{position:sticky;top:70px;align-self:start}
-  .aside .kbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px 16px 18px}
+  .aside .kbox{background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(14px) saturate(150%);backdrop-filter:blur(14px) saturate(150%);border:1px solid rgba(255,255,255,.65);border-radius:18px;box-shadow:0 10px 30px rgba(15,23,42,.05);padding:16px 16px 18px}
   .aside .klabel{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--indigo);margin-bottom:9px}
   .aside .ktext{font-size:14px;color:#334155;line-height:1.55;font-weight:500;min-height:66px}
   .aside .kmeta{margin-top:6px;font-size:12px;color:var(--faint)}
@@ -159,10 +197,68 @@
   @media(max-width:1180px){.shell{grid-template-columns:212px minmax(0,720px);gap:30px}.aside{display:none}}
   @media(max-width:920px){.shell{grid-template-columns:minmax(0,760px);padding:0}.toc{display:none}}
   @media(max-width:560px){h1{font-size:34px}h2{font-size:25px}.cols{grid-template-columns:1fr}}
+
+  /* ===== liquid-glass theme toggle + night mode (light is default) ===== */
+  .theme-toggle{position:fixed;top:18px;right:20px;z-index:60;width:50px;height:50px;border-radius:15px;
+    border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.55);
+    -webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%);
+    color:#0f766e;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+    box-shadow:0 8px 26px rgba(15,23,42,.14), inset 0 1px 0 rgba(255,255,255,.7);transition:transform .15s, color .15s, box-shadow .15s}
+  .theme-toggle:hover{color:#00674f;transform:translateY(-1px);box-shadow:0 12px 30px rgba(15,23,42,.18), inset 0 1px 0 rgba(255,255,255,.7)}
+  .theme-toggle:active{transform:translateY(0) scale(.96)}
+  .theme-toggle svg{width:24px;height:24px;fill:currentColor}
+  .theme-toggle .sun{display:none}
+  body.dark .theme-toggle{background:rgba(22,28,38,.6);border-color:rgba(255,255,255,.1);color:#6ee7b7;box-shadow:0 8px 26px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.1)}
+  body.dark .theme-toggle:hover{color:#a7f3d0}
+  body.dark .theme-toggle .moon{display:none}
+  body.dark .theme-toggle .sun{display:block}
+
+  body.dark{
+    --bg:#0e1117; --panel:#161c26; --ink:#e6ebf3; --muted:#9aa6b8; --faint:#6b7688;
+    --line:#2a3342; --indigo:#818cf8; --indigo-soft:#1d2438;
+    --emerald:#34d399; --emerald-soft:#13261f; --red:#f87171; --red-soft:#2a1414;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.45);
+  }
+  body.dark::before{
+    background:
+      linear-gradient(rgba(52,211,153,.035) 1px, transparent 1px) 0 0/46px 46px,
+      linear-gradient(90deg, rgba(52,211,153,.035) 1px, transparent 1px) 0 0/46px 46px,
+      radial-gradient(58% 48% at 86% -2%, rgba(16,185,129,.16), transparent 68%),
+      radial-gradient(52% 42% at -4% 102%, rgba(16,185,129,.12), transparent 70%);
+  }
+  body.dark .toc{background:rgba(22,28,38,.5);border-color:rgba(255,255,255,.06);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  body.dark .aside .kbox{background:rgba(22,28,38,.55);border-color:rgba(255,255,255,.06);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  body.dark .toc ol::before{background:rgba(255,255,255,.09)}
+  body.dark .toc li.active{color:#50c878}
+  body.dark .toc li.active .num{color:#50c878}
+  body.dark .aside .ktext{color:#c2ccdb}
+  body.dark .aside .kbar{background:#222c3a}
+  body.dark p.lead{color:#c2ccdb}
+  body.dark button{background:var(--panel)}
+  body.dark button.primary{background:#4f46e5;border-color:#4f46e5;color:#fff}
+  body.dark button.danger{background:#dc2626;border-color:#dc2626;color:#fff}
+  body.dark .toggle{background:var(--panel)}
+  body.dark .bar{background:#0a0e16}
+  body.dark .barlabel{color:#e6ebf3;mix-blend-mode:normal}
+  body.dark .cell{background:var(--panel)}
+  body.dark .cell.skip{background:var(--panel)}
+  body.dark .cell.done{color:#a7f3d0}
+  body.dark .store.local{background:var(--panel)}
+  body.dark .store.durable{background:#10151f}
+  body.dark .verdict.ok{color:#86efac}
+  body.dark .verdict.bad{color:#fca5a5}
+  body.dark code.inline{color:#a5b4fc}
+  body.dark .store.durable .chip{color:#a7f3d0}
+  body.dark .site-footer{background:var(--panel)}
+  body.dark .foot-col a .soon{background:#222c3a}
 </style>
 </head>
 <body>
 <div class="progress-top" id="topbar"></div>
+<button class="theme-toggle" id="themeBtn" aria-label="Toggle night mode" title="Toggle night mode">
+  <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-15a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm0 18a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1zM3 11h2a1 1 0 1 1 0 2H3a1 1 0 1 1 0-2zm16 0h2a1 1 0 1 1 0 2h-2a1 1 0 1 1 0-2zM5.6 5.6a1 1 0 0 1 1.4 0l.7.7A1 1 0 0 1 6.3 7.7l-.7-.7a1 1 0 0 1 0-1.4zm11 11a1 1 0 0 1 1.4 0l.7.7a1 1 0 0 1-1.4 1.4l-.7-.7a1 1 0 0 1 0-1.4zm1.4-11a1 1 0 0 1 0 1.4l-.7.7a1 1 0 1 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 0zM6.3 16.3a1 1 0 0 1 0 1.4l-.7.7a1 1 0 0 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 0z"/></svg>
+</button>
 
 <header class="hero">
   <div class="wrap">
@@ -340,7 +436,7 @@
     <div class="cta">
       <h3>Found this useful?</h3>
       <p>I write about the unglamorous engineering that makes ML actually ship.</p>
-      <p style="margin-top:14px"><b>Read the full write-up with all the code →</b></p>
+      <p style="margin-top:16px"><a href="https://dev.to/tanay_joshi_04/never-lose-a-training-run-again-a-checkpoint-and-resume-playbook-for-ephemeral-gpus-2m1j" target="_blank" rel="noopener" style="display:inline-block;background:#fff;color:#4f46e5;font-weight:700;text-decoration:none;padding:11px 22px;border-radius:10px;font-size:15px">Read the full write-up with all the code →</a></p>
     </div>
   </div>
 </section>
@@ -356,7 +452,7 @@
 <footer class="site-footer">
   <div class="foot-grid">
     <div class="foot-brand">
-      <div class="foot-logo"><span class="mark">↻</span> Bulletproof Training</div>
+      <div class="foot-logo"><span class="mark"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="fem" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="0.55" stop-color="#10b981"/><stop offset="1" stop-color="#059669"/></linearGradient><linearGradient id="fgl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.45"/><stop offset="0.5" stop-color="#fff" stop-opacity="0.08"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect x="1" y="1" width="30" height="30" rx="8" fill="url(#fem)"/><rect x="1" y="1" width="30" height="15" rx="8" fill="url(#fgl)"/><rect x="1.6" y="1.6" width="28.8" height="28.8" rx="7.4" fill="none" stroke="#fff" stroke-opacity="0.55"/><path d="M16 5.2 L24.4 8 V15.2 C24.4 20.6 20.8 24.4 16 26.6 C11.2 24.4 7.6 20.6 7.6 15.2 V8 Z" fill="#fff" fill-opacity="0.96"/><rect x="12.3" y="11.2" width="7.4" height="7.4" rx="1.6" fill="#0c8f63"/><rect x="14" y="12.9" width="4" height="4" rx="0.8" fill="#fff" fill-opacity="0.92"/><g fill="#0c8f63"><rect x="13.3" y="9.5" width="1.1" height="1.9" rx="0.5"/><rect x="15.45" y="9.5" width="1.1" height="1.9" rx="0.5"/><rect x="17.6" y="9.5" width="1.1" height="1.9" rx="0.5"/><rect x="13.3" y="18.6" width="1.1" height="1.9" rx="0.5"/><rect x="15.45" y="18.6" width="1.1" height="1.9" rx="0.5"/><rect x="17.6" y="18.6" width="1.1" height="1.9" rx="0.5"/><rect x="9.7" y="13.3" width="1.9" height="1.1" rx="0.5"/><rect x="9.7" y="15.45" width="1.9" height="1.1" rx="0.5"/><rect x="20.4" y="13.3" width="1.9" height="1.1" rx="0.5"/><rect x="20.4" y="15.45" width="1.9" height="1.1" rx="0.5"/></g></svg></span> Bulletproof Training</div>
       <p class="foot-tag">A pattern for making ML training runs resumable and idempotent on ephemeral GPUs — so a disconnect costs seconds, not hours.</p>
       <div class="foot-social">
         <a href="https://x.com/MysteryMan60934" target="_blank" rel="noopener" aria-label="X / Twitter" title="X / Twitter">
@@ -409,7 +505,9 @@
 <script>
 // ---------- scroll progress ----------
 const topbar=document.getElementById('topbar');
-addEventListener('scroll',()=>{const h=document.documentElement;const p=h.scrollTop/(h.scrollHeight-h.clientHeight);topbar.style.width=(p*100)+'%';});
+let tocOl=null;
+addEventListener('scroll',()=>{const h=document.documentElement;const p=h.scrollTop/(h.scrollHeight-h.clientHeight);topbar.style.width=(p*100)+'%';
+  if(!tocOl)tocOl=document.querySelector('.toc ol');if(tocOl)tocOl.style.setProperty('--p',Math.max(0,Math.min(1,p)));});
 
 // ---------- helper ----------
 const $=id=>document.getElementById(id);
@@ -680,6 +778,16 @@ function toggleClick(el,cb){el.addEventListener('click',()=>{el.classList.toggle
   },{rootMargin:'-45% 0px -45% 0px',threshold:0});
   sections.forEach(s=>io.observe(s));
   setActive(0);
+})();
+
+// ============ NIGHT MODE TOGGLE (light is default) ============
+(()=>{
+  const btn=document.getElementById('themeBtn');
+  try{ if(localStorage.getItem('bt-theme')==='dark') document.body.classList.add('dark'); }catch(e){}
+  btn.onclick=()=>{
+    document.body.classList.toggle('dark');
+    try{ localStorage.setItem('bt-theme', document.body.classList.contains('dark')?'dark':'light'); }catch(e){}
+  };
 })();
 </script>
 </body>
